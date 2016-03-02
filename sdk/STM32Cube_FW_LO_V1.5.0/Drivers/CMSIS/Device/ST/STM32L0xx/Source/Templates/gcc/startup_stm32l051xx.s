@@ -68,6 +68,7 @@ Reset_Handler:
    mov   sp, r0          /* set stack pointer */
 
 /* Copy the data segment initializers from flash to SRAM */
+/*
   movs  r1, #0
   b  LoopCopyDataInit
 
@@ -83,6 +84,20 @@ LoopCopyDataInit:
   adds  r2, r0, r1
   cmp  r2, r3
   bcc  CopyDataInit
+*/
+
+CopyDataInitializersStart:
+  ldr   r0, =_sdata   /* write to this addr */
+  ldr   r1, =_edata   /* until you get to this addr */
+  ldr   r2, =_sidata  /* reading from this addr */
+  b     CopyDataInitializersEnterLoop
+CopyDataInitializersLoop:
+  ldmia r2!, {r3}
+  stmia r0!, {r3}
+CopyDataInitializersEnterLoop:
+  cmp   r0, r1
+  bcc   CopyDataInitializersLoop
+
 /*
   ldr  r2, =_sbss
   b  LoopFillZerobss
